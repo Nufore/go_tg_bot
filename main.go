@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"go_tg_bot/clients/telegram"
 	"log"
 	"os"
 
@@ -9,15 +9,26 @@ import (
 )
 
 func main() {
+	host := getHost()
 	token := getToken()
-	fmt.Printf("Bot token = %s\n", token)
-	// tgClient = telegram.New(token)
+
+	tgClient := telegram.New(host, token)
 
 	// fetcher = fetcher.New()
 
 	// processor = processor.New()
 
 	// consumer.Start(fetcher, processor)
+}
+
+func getHost() string {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("token(): Error loading .env file.")
+	}
+
+	host := os.Getenv("HOST")
+	return host
 }
 
 func getToken() string {
