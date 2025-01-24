@@ -1,24 +1,36 @@
 package main
 
 import (
-	"go_tg_bot/clients/telegram"
+	tg_client "go_tg_bot/clients/telegram"
+	event_consumer "go_tg_bot/consumer/event-consumer"
+	tg_proc "go_tg_bot/events/telegram"
+	"go_tg_bot/storage/files"
 	"log"
 	"os"
 
 	"github.com/joho/godotenv"
 )
 
+const (
+	storagePath = "storage"
+	batchSize   = 100
+)
+
 func main() {
 	host := getHost()
 	token := getToken()
 
-	tgClient := telegram.New(host, token)
+	tgClient := tg_client.New(host, token)
 
-	// fetcher = fetcher.New()
+	eventsProcessor := tg_proc.New(tgClient, files.New(storagePath))
 
-	// processor = processor.New()
+	log.Print("service started")
 
-	// consumer.Start(fetcher, processor)
+	consumer := event_consumer.New(eventsProcessor, eventsProcessor, batchSize)
+
+	if err := consumer.Start(); err != nil {
+		log.Fatal("service is stopped", err)
+	}
 }
 
 func getHost() string {
